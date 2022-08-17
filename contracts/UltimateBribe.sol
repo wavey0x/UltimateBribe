@@ -24,6 +24,7 @@ contract UltimateBribe {
     }
 
     function addBribe(address _token, uint _amount) external {
+        require(!accepted, "Already accepted bribe");
         address owner = voter.owner();
         require(owner == originalOwner);
         require(msg.sender != owner);
@@ -35,7 +36,6 @@ contract UltimateBribe {
     function retractBribe(address _token) external {
         address owner = voter.owner();
         require(msg.sender != owner);
-        require(owner == originalOwner);
         uint amount = bribe[msg.sender][_token];
         require(amount > 0);
         bribe[msg.sender][_token] = 0;
