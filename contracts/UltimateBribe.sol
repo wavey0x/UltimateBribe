@@ -43,13 +43,18 @@ contract UltimateBribe {
         emit BribeRetracted(msg.sender, _token, amount);
     }
 
-    function acceptBribe(address _token) external {
+    //@notice when accepting bribe, must call this function atomically in same txn that ownership is changed.
+    // or else you risk losing it to a retraction.
+    // @param _token to claim
+    // @param _min tokens to claim. ensuring bribee doesn't front-run your acceptance
+    function acceptBribe(address _token, uint _min) external {
+        require(!accepted);
         address newOwner = voter.owner();
         require(msg.sender == originalOwner);
         require(msg.sender != newOwner);
-        require(!accepted);
         accepted = true;
         uint amount = bribe[newOwner][_token];
+        require(amount >= _min, "Not enough");
         IERC20(_token).transfer(msg.sender, amount);
         emit BribeAccepted(newOwner, _token, amount);
     }
