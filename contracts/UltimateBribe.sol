@@ -34,8 +34,6 @@ contract UltimateBribe {
     }
 
     function retractBribe(address _token) external {
-        address owner = voter.owner();
-        require(msg.sender != owner);
         uint amount = bribe[msg.sender][_token];
         require(amount > 0);
         bribe[msg.sender][_token] = 0;
@@ -54,6 +52,7 @@ contract UltimateBribe {
         require(msg.sender != newOwner);
         accepted = true;
         uint amount = bribe[newOwner][_token];
+        bribe[newOwner][_token] = 0;
         require(amount >= _min, "Not enough");
         IERC20(_token).transfer(msg.sender, amount);
         emit BribeAccepted(newOwner, _token, amount);
